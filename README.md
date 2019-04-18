@@ -7,6 +7,6 @@ As always this code comes with no warranties for correctness or appropriateness.
 
 ##  Original Data Information
 
-_Dark Sky_
+**_Dark Sky_**
 
 This code uses the Dark Sky API from ![Dark Sky](https://darksky.net/dev/img/attribution/poweredby.png).  Any user is required to obtain their own API Key.  This service is a pay-as-you-go service; therefore, a user of this code is responsible for their own costs.
