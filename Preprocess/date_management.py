@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-from datetime import date
+from datetime import date, timedelta
 import datetime as dz
 from dateutil import tz
 import time as tm
+from copy import deepcopy
 
 def to_date_time_str(config=None):
     '''
@@ -63,3 +64,30 @@ def to_local_time(in_linux_timestamp=None, in_zone=None):
     day = local_time[0]
     t = local_time[1]
     return day, t
+#
+def get_date_from_config(config=None):
+    assert config is not None
+    year = config["year"]
+    month = config["month"]
+    day = config["day"]
+    return date(year,month,day)
+#
+def increment_config_by_one_day(config=None):
+    """
+    Purpose:  Increment the configuration file date by one day
+    
+    Keyword Arguments:
+        config {dictionary} -- The configuration file to get weather data (default: {None})
+
+    Output:
+        An updated config file
+    """
+    assert config is not None
+    new_config = deepcopy(config)
+    w_time = get_date_from_config(new_config)
+    next_day = w_time + timedelta(days=1)
+    new_config["year"]=next_day.year
+    new_config["month"]=next_day.month
+    new_config["day"] = next_day.day
+    return new_config
+
