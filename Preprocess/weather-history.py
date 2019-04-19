@@ -1,9 +1,43 @@
 #!/usr/bin/env python3
 import requests
 import json
+import datetime
 from pprint import pprint
-from date_management import *
-from dark_sky_management import *
+from copy import deepcopy
+from Preprocess.date_management import *
+from Preprocess.dark_sky_management import *
+
+def process_weather(weather):
+    '''
+    Purpose:  Process the data into a format that can add the data to
+    a pandas table
+
+    Inputs:  weather is a dictionary that contains historical weather data 
+    a particular date.
+
+    Output:
+    out_array is an array of the hourly weather for a lat/long with date and time
+    in local time as defined by the timezone
+
+    '''
+    interesting_data = ['dewPoint','humidity','precipIntensity',
+        'pressure','temperature','uvIndex','visibility',
+        'windBearing','windGust','windSpeed']
+    out_array = []
+    time_zone = weather['timezone']
+    work_data = weather['hourly']['data']
+    for w in work_data:
+        c_time = w['time']
+        l_day, l_time = to_local_time(c_time,time_zone)
+        res = {'time': c_time,
+            'day': l_day,
+            'hm':l_time,
+            'tz':time_zone
+        }
+        for n in interesting_data:
+            res[n] = w[n]
+        out_array.append(res)
+    return out_array
 
 config_file = "../weather.cfg"
 
@@ -11,6 +45,21 @@ if __name__ == "__main__":
     config_data = None
     with open(config_file) as json_data_file:
         config_data = json.load(json_data_file)
+    
+    work_config = deepcopy(config_data)
+    work_config["year"] = work_config["start_year"]
+    work_config["month"] = work_config["start_month"]
+    work_config["day"] = work_config["start_day"]
+    start_date_str = to_date_time_str(work_config)
+    zero_time_start_date_str = to_date_time_zero_hr(work_config)
+    dt = to_date_time(work_config)
+    # for i in range(35):
+    #     ndt = dt + datetime.timedelta(days=i)
+    #     pprint(ndt)
+    weather = get_historical_weather(work_config)
+    time_data = process_weather(weather)
+    for t in time_data:
+        pprint(t)
 
 # start_month = 5
 # start_day = 1
