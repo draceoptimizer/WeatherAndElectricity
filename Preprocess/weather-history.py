@@ -20,7 +20,7 @@ Side Effects:
 """
 import requests
 import json
-import datetime
+import datetime as dt
 import pandas as pd
 from pprint import pprint
 from copy import deepcopy
@@ -39,17 +39,36 @@ if __name__ == "__main__":
     weather_file_name = str(config_data.get("weather_file",weather_file_name))
     weather_pd = get_weather_panda(weather_file_name)
     work_config = get_weather_start_config(weather_pd, config_data)
+    weather = get_historical_weather(work_config)
+    time_zone = weather["timezone"]
+    work_config["time_zone"] = time_zone
     data_array = []
     last_date = date.today() - timedelta(days=1)
-    for i in range(max_days):
-        c_date = get_date_from_config(work_config)
+    last_date = dt.datetime(last_date.year,last_date.month,last_date.day).timestamp()
+    i_count = 0
+    current_time = get_timestamp_from_config(work_config)
+    print(current_time)
+    print(last_date)
+    while i_count < max_days and current_time < last_date:
+        c_date = get_timestamp_from_config(work_config)
         if c_date < last_date:
             weather = get_historical_weather(work_config)
             weather_array = process_weather(weather)
-            data_array.append(weather_array)
+            data_array.extend(weather_array)
         work_config = increment_config_by_one_day(work_config)
+        i_count += 1
+        current_time = get_timestamp_from_config(work_config)
+    #append the new data to the current panda
+    add_weather_pd = pd.DataFrame.from_dict(data_array)
+    add_weather_pd = add_weather_pd[get_all_weather_names()]
+    weather_pd = weather_pd.append(add_weather_pd,ignore_index=True,sort=False)
+    w_columns = weather_pd.columns
+    while w_columns[0] != 'time':
+        weather_pd = weather_pd.drop(w_columns[0],axis=1)
+        w_columns = weather_pd.columns
+    weather_pd.to_csv(weather_file_name)
     #show the data
-    pprint(data_array)
+    #pprint(data_array)
 
     # work_config = deepcopy(config_data)
     # work_config["year"] = work_config["start_year"]

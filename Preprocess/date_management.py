@@ -72,6 +72,12 @@ def get_date_from_config(config=None):
     day = config["day"]
     return date(year,month,day)
 #
+def get_timestamp_from_config(config=None):
+    assert config is not None
+    d = get_date_from_config(config)
+    return dz.datetime(d.year,d.month,d.day).timestamp()
+
+#
 def increment_config_by_one_day(config=None):
     """
     Purpose:  Increment the configuration file date by one day

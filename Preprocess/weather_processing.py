@@ -64,7 +64,6 @@ def process_weather(weather):
                 res[n] = w[n]
             except:
                 res[n] = None
-                keep_data = False
         if keep_data:
             out_array.append(res)
     return out_array
@@ -107,16 +106,18 @@ def get_weather_start_config(in_pd=None, config=None):
     work_config = None
     if num_rows == 0:
         work_config = deepcopy(config)
-        work_config["year"] = work_config["start_year"]
-        work_config["month"] = work_config["start_month"]
-        work_config["day"] = work_config["start_day"]
+        work_config["year"] = int(work_config["start_year"])
+        work_config["month"] = int(work_config["start_month"])
+        work_config["day"] = int(work_config["start_day"])
         return work_config
     else:
+        print("Extending Existing Data")
         work_config = deepcopy(config)
-        last_data = in_pd[-1]
+        last_data = in_pd.iloc[-1]
         day_val = last_data["day"]
-        all_vals = day_val.split("-")
-        work_config["year"] = all_vals[0]
-        work_config["month"] = all_vals[1]
-        work_config["day"] = all_vals[2]
+        all_vals = day_val.split("/")
+        work_config["year"] = int(all_vals[0])
+        work_config["month"] = int(all_vals[1])
+        work_config["day"] = int(all_vals[2])
+        work_config = increment_config_by_one_day(work_config)
         return work_config
