@@ -50,6 +50,8 @@ if __name__ == "__main__":
     print(current_time)
     print(last_date)
     while i_count < max_days and current_time < last_date:
+        if i_count %50 == 0:
+            print("Number of days of weather information: {}".format(i_count))
         c_date = get_timestamp_from_config(work_config)
         if c_date < last_date:
             weather = get_historical_weather(work_config)
@@ -58,15 +60,17 @@ if __name__ == "__main__":
         work_config = increment_config_by_one_day(work_config)
         i_count += 1
         current_time = get_timestamp_from_config(work_config)
+    print("Number of days of weather information: {}".format(i_count))
     #append the new data to the current panda
+
     add_weather_pd = pd.DataFrame.from_dict(data_array)
     add_weather_pd = add_weather_pd[get_all_weather_names()]
     weather_pd = weather_pd.append(add_weather_pd,ignore_index=True,sort=False)
     w_columns = weather_pd.columns
-    while w_columns[0] != 'time':
+    while not (w_columns[0] in get_all_weather_names()):
         weather_pd = weather_pd.drop(w_columns[0],axis=1)
         w_columns = weather_pd.columns
-    weather_pd.to_csv(weather_file_name)
+    weather_pd.to_csv(weather_file_name,na_rep="-1")
     #show the data
     #pprint(data_array)
 
@@ -83,28 +87,3 @@ if __name__ == "__main__":
     # for t in time_data:
     #     pprint(t)
 
-# start_month = 5
-# start_day = 1
-# start_year = 2017
-# end_month = 5
-# end_day = 1
-# end_year = 2017
-# user_key = "e0c47993d5f64a030a76b8208ae2ab56"
-# user_lat = "32.842685"
-# user_long = "-96.653671"
-# website = "https://api.darksky.net/forecast"
-# cur_date = "{}-{:02d}-{:02d}T00:00:00".format(start_year,start_month,start_day)
-# from_zone = tz.tzutc()
-# to_zone = tz.gettz("America/Chicago")
-
-# full_command = website + "/" + user_key + "/" + user_lat + "," + user_long + "," + cur_date + "?exclude=currently,daily,flags"
-# print(full_command)
-# r = requests.get(full_command)
-# forecast = r.json()
-# pprint(forecast)
-# for i in range(24):
-#     cur_time = forecast["hourly"]["data"][i]["time"]
-#     time_zone = forecast['timezone']
-#     to_zone = tz.gettz(time_zone)
-#     local_time = dt.datetime.fromtimestamp(cur_time,to_zone).strftime("%Y/%m/%d %H:%M")
-#     print(local_time)

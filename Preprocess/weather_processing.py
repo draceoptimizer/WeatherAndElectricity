@@ -6,7 +6,7 @@ from pprint import pprint
 """Functions to provide weather processing
 
 """
-weather_time_names = ['time','day','hm','tz']
+weather_time_names = ['lat','long','time','day','hm','tz']
 #
 def get_weather_data_names():
     """Returns the weather data names
@@ -28,7 +28,7 @@ def get_weather_time_names():
 
     Output:  the array of weather time names
     """
-    return ['time','day','hm','tz']
+    return ['lat','long','time','day','hm','tz']
 #
 def get_all_weather_names():
     return  get_weather_time_names() + get_weather_data_names()
@@ -57,7 +57,9 @@ def process_weather(weather):
         res = {'time': c_time,
             'day': l_day,
             'hm':l_time,
-            'tz':time_zone
+            'tz':time_zone,
+            'lat':weather['latitude'],
+            'long':weather['longitude']
         }
         for n in interesting_data:
             try:

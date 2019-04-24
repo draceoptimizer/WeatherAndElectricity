@@ -103,4 +103,10 @@ def get_historical_weather(config):
     except requests.exceptions.RequestException as e:  # This is the correct syntax
         pprint(e)
         sys.exit(1)
-    return result.json()
+    try:
+        return result.json()
+    except e:
+        pprint(e)
+        pprint(result)
+        pprint(url)
+        sys.exit(1)
