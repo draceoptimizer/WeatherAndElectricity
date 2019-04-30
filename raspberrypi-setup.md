@@ -91,7 +91,7 @@ sudo reboot -h now
 Check your configuration using 
 
 ```bash
-ifconfig
+ip a
 ```
 
 ###  Add a custom user
@@ -153,7 +153,6 @@ Once the system is set up and configured, it is ready for advanced configuration
 
 * Set up passwordless ssh between the servers (and my workstation)
 * Set up common host files
-* Install Anaconda on the work servers
 * Install basic Docker images on the work servers
 
 ### Passwordless ssh
