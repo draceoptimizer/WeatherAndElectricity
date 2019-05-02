@@ -107,14 +107,14 @@ def get_weather_start_config(in_pd=None, config=None):
     num_rows = df_shape[0]
     work_config = None
     if num_rows == 0:
-        work_config = deepcopy(config)
+        work_config = config.state()
         work_config["year"] = int(work_config["start_year"])
         work_config["month"] = int(work_config["start_month"])
         work_config["day"] = int(work_config["start_day"])
         return work_config
     else:
         print("Extending Existing Data")
-        work_config = deepcopy(config)
+        work_config = config.state()
         last_data = in_pd.iloc[-1]
         day_val = last_data["day"]
         all_vals = day_val.split("/")

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from datetime import date, timedelta
 import datetime as dz
-from dateutil import tz
+from dateutil import du
 import time as tm
 from copy import deepcopy
 
@@ -58,7 +58,7 @@ def to_local_time(in_linux_timestamp=None, in_zone=None):
     day - A string in the form YYYY-m-d
     t - A string in the form HH:MM
     '''
-    to_zone = tz.gettz(in_zone)
+    to_zone = du.gettz(in_zone)
     local_time = dz.datetime.fromtimestamp(in_linux_timestamp,to_zone).strftime("%Y/%m/%d %H:%M")
     local_time = local_time.split()
     day = local_time[0]

@@ -27,21 +27,19 @@ from copy import deepcopy
 from Preprocess.date_management import *
 from Preprocess.dark_sky_management import *
 from Preprocess.weather_processing import *
+from Helpers.Config import Config
 #  Default values
-config_file = "../weather.cfg"
-max_number_day_processes = 10
-weather_file_name = "weather.txt"
-if __name__ == "__main__":
-    config_data = None
-    with open(config_file) as json_data_file:
-        config_data = json.load(json_data_file)
-    max_days = config_data.get("max_number_requests" ,max_number_day_processes)
-    weather_file_name = str(config_data.get("weather_file",weather_file_name))
+def gather_weather(config:Config):
+    assert config is not None, "A config file must be passed."
+    assert isinstance(config,Config), "The config object must be an instance of Config."
+
+    max_days = config.conf["max_number_requests"]
+    weather_file_name = config.conf["weather_file"]
     weather_pd = get_weather_panda(weather_file_name)
-    work_config = get_weather_start_config(weather_pd, config_data)
+    work_config = get_weather_start_config(weather_pd, config)
     weather = get_historical_weather(work_config)
     time_zone = weather["timezone"]
-    work_config["time_zone"] = time_zone
+    config.conf["time_zone"] = time_zone
     data_array = []
     last_date = date.today() - timedelta(days=1)
     last_date = dt.datetime(last_date.year,last_date.month,last_date.day).timestamp()
@@ -70,20 +68,6 @@ if __name__ == "__main__":
     while not (w_columns[0] in get_all_weather_names()):
         weather_pd = weather_pd.drop(w_columns[0],axis=1)
         w_columns = weather_pd.columns
-    weather_pd.to_csv(weather_file_name,na_rep="-1")
-    #show the data
-    #pprint(data_array)
+    weather_pd.to_csv(weather_file_name,na_rep="0")
 
-    # work_config = deepcopy(config_data)
-    # work_config["year"] = work_config["start_year"]
-    # work_config["month"] = work_config["start_month"]
-    # work_config["day"] = work_config["start_day"]
-    # start_date_str = to_date_time_str(work_config)
-    # zero_time_start_date_str = to_date_time_zero_hr(work_config)
-    # dt = to_date_time(work_config)
-
-    # weather = get_historical_weather(work_config)
-    # time_data = process_weather(weather)
-    # for t in time_data:
-    #     pprint(t)
 
