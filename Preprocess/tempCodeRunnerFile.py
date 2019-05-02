@@ -1,0 +1,1 @@
+weather_time_names = ['lat','long','time','day','hm','tz']

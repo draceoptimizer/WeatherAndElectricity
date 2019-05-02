@@ -3,11 +3,20 @@ import json
 import os, sys
 from pprint import pprint, pformat
 from copy import deepcopy
+import collections
+#  Date/Time imports
+from datetime import date, timedelta
+import datetime as dz
+from dateutil import tz
+import time as tm
 """
 Purpose:  General configuration management class so the information can 
 be passed around safely
+
+This is written as a MutableMapping so that it acts like a dictionary with additional
+features for location, date and time management
 """
-class Config(object):
+class Config(collections.MutableMapping):
     """The class for managing the driving structure information
 
     This application requires a good bit of input because I prefer not
@@ -24,11 +33,15 @@ class Config(object):
         with open(cfg_file) as json_data_file:
             cfg = json.load(json_data_file)
         #check for required fields
-        self.conf = {}
+        self.conf = dict()
         #Set some defaults
         self.conf["max_number_requests"] = 2
         self.conf["weather_file"] = "weather.txt"
         self.conf["verbose"] = False
+        #This is the working year, month day used to control processing
+        self.conf["year"] = None
+        self.conf["month"] = None
+        self.conf["day"] = None
         #Process the input config file
         self.conf["website"] = self.__check_value__(cfg,"website","The website for Dark Sky must be provided.")
         self.conf["key"] = self.__check_value__(cfg,"key","The user key must be provided.")
@@ -66,6 +79,92 @@ class Config(object):
     def state(self):
         cfg = deepcopy(self.conf)
         return cfg
-    #
+    #  Overloads so that it acts kinda like a dictionary
+    def __getitem__(self,key:str) -> str:
+        try:
+            return self.conf[self.__keytransform__(key)]
+        except KeyError as e:
+            print("Key error {} : {}".format(e,self.__keytransform__(key)))
+    def __setitem__(self,key:str,value):
+        self.conf[self.__keytransform__(key)] = value
+    def __delitem__(self,key:str):
+        del self.conf[self.__keytransform__(key)]
+    def __len__(self):
+        return len(self.conf)
+    def __keytransform__(self, key:str) -> str:
+        return key.lower()
+    def __iter__(self):
+        return iter(self.conf)
     def __repr__(self):
         return pformat(self.state())
+    #
+    #  Date Management functions
+    #
+    def timezone(self):
+        return self.conf["timezone"]
+    def get_start_ymd(self):
+        return self.conf["start_year"], self.conf["start_month"],self.conf["start_day"]
+    def get_ymd(self):
+        return self.conf["year"], self.conf["month"],self.conf["day"]
+    def update_ymd(self,yr, mon, day):
+        self.conf["year"] = yr
+        self.conf["month"] = mon
+        self.conf["day"] = day
+    def extract_date(self) -> date:
+        '''Simple method to return a string from current date in object
+
+        Returns:
+            A datetime.date
+        '''
+        year, month, day = self.get_ymd()
+        return date(year,month,day)
+    #
+    def extract_date_time_zero_hr(self) -> str:
+        '''Simple routine to return a string for the current date in object
+
+        Returns:
+            String in the defined format for python3
+        '''
+        return self.extract_date().ctime()
+    #
+    def extract_date_time_str(self) -> str:
+        '''Simple routine to return a string from the current date in object
+
+        Returns:
+            String in the format YYYY-MM-DD
+        '''
+        return self.extract_date().isoformat()
+    #
+    def get_timestamp(self) -> float:
+        """Simple method to return the UTC timestamp for the current date in object
+        
+        Returns:
+            float -- UTC timestamp
+        """
+        d = self.extract_date()
+        return dz.datetime(d.year,d.month,d.day).timestamp()
+    #
+    def to_local_time(self,in_linux_timestamp=None) -> (str, str):
+        '''Return the local time information with date, hour and minute
+
+        Input:  
+            in_linux_timestamp is the linux time since the epoch in UTC
+
+        Output:
+            day - A string in the form YYYY-m-d
+            t - A string in the form HH:MM
+        '''
+        to_zone = self["timezone"]
+        local_time = dz.datetime.fromtimestamp(in_linux_timestamp,to_zone).strftime("%Y/%m/%d %H:%M")
+        local_time = local_time.split()
+        day = local_time[0]
+        t = local_time[1]
+        return (day, t)
+    #
+    def increment_config_by_one_day(self):
+        """Increment the configuration date by one day
+
+        """
+        w_time = self.extract_date()
+        next_day = w_time + timedelta(days=1)
+        self.update_ymd(next_day.year,next_day.month,next_day.day)

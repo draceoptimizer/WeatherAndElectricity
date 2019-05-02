@@ -6,9 +6,10 @@ import sys
 import requests
 import json
 from pprint import pprint
+from Helpers.Config import Config
 # from date_management import *
 #
-def build_forecast_request(config):
+def build_forecast_request(config:Config) -> str:
     '''
         Purpose:  This function build a Dark Sky forecast request to get current information
         It is mainly focused on a limited set of information

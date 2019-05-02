@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-from Preprocess.date_management import *
+from Helpers.date_management import *
 from copy import deepcopy
+import pandas
 import pandas as pd
 from pprint import pprint
 """Functions to provide weather processing
@@ -93,7 +94,7 @@ def get_weather_panda(weather_file=None):
     work_weather.sort_values(["time"])
     return work_weather
 #
-def get_weather_start_config(in_pd=None, config=None):
+def get_weather_start_config(in_pd:pd.DataFrame, config:Config) -> Config:
     """
     Purpose:  obtain the starting date for getting new data from the weather file
     
@@ -101,25 +102,23 @@ def get_weather_start_config(in_pd=None, config=None):
         in_pd {pandas} -- the pandas of the weather data (default: {None})
         config {dictionary} -- the dictionary of the processing controls (default: {None})
     """
-    assert in_pd is not None
-    assert config is not None
+    assert isinstance(in_pd,pd.DataFrame)
+    assert isinstance(config,Config)
     df_shape = in_pd.shape
     num_rows = df_shape[0]
     work_config = None
     if num_rows == 0:
-        work_config = config.state()
-        work_config["year"] = int(work_config["start_year"])
-        work_config["month"] = int(work_config["start_month"])
-        work_config["day"] = int(work_config["start_day"])
+        work_config = deepcopy(config)
+        year, month, day = work_config.get_start_ymd()
+        work_config.update_ymd(year,month,day)
         return work_config
     else:
         print("Extending Existing Data")
-        work_config = config.state()
+        work_config = deepcopy(config)
         last_data = in_pd.iloc[-1]
         day_val = last_data["day"]
         all_vals = day_val.split("/")
-        work_config["year"] = int(all_vals[0])
-        work_config["month"] = int(all_vals[1])
-        work_config["day"] = int(all_vals[2])
+        year, month, day = list(map(int,all_vals))
+        work_config.update_ymd(year,month,day)
         work_config = increment_config_by_one_day(work_config)
         return work_config
