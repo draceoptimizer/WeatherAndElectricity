@@ -51,7 +51,7 @@ def gather_weather(config:Config):
         print("\t{}".format(current_time))
         print("\t{}".format(last_date))
         icount = 0
-        while current_time < last_date:
+        while icount < max_days and current_time < last_date:
             if icount%50 == 0:
                 print("Number of days added to weather information: {}".format(icount))
             c_date = gw["cfg"].get_timestamp()
