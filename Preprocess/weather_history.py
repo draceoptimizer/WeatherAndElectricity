@@ -50,10 +50,13 @@ def gather_weather(config:Config):
         print("Gathering additional Weather Data")
         print("\t{}".format(current_time))
         print("\t{}".format(last_date))
+        print("\tNumber to process {}.".format(max_days))
+        sys.stdout.flush()
         icount = 0
         while icount < max_days and current_time < last_date:
-            if icount%50 == 0:
+            if icount%5 == 0:
                 print("Number of days added to weather information: {}".format(icount))
+                sys.stdout.flush()
             c_date = gw["cfg"].get_timestamp()
             if c_date < last_date:
                 weather = get_historical_weather(gw["cfg"])
@@ -64,10 +67,12 @@ def gather_weather(config:Config):
             icount += 1
         print("Number of days of weather information: {}".format(icount))
         print(len(data_array))
-        gw.add_additional_weather(weather_array)
+        gw.add_additional_weather(data_array)
         gw.save_weather()
         print("Collected {} days of weather.".format(icount))
         print("--------------{}-------------".format(datetime.today()))
         print("Sleeping to not try too much per day (per Dark Sky)")
+        sys.stdout.flush()
         time.sleep(60 * 60)
+        
 

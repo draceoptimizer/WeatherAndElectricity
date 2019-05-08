@@ -65,6 +65,7 @@ class WeatherManagement(collections.MutableMapping):
             work_weather = pd.DataFrame(columns=all_columns)
         work_weather.sort_values(["time"])
         self["weather_panda"] = work_weather
+        print("Set Weather Panda {}".format(self["weather_panda"].shape[0]))
     #
     def set_weather_gather_start_date(self):
         """Purpose:  obtain the starting date for getting new data for the weather file
@@ -91,13 +92,16 @@ class WeatherManagement(collections.MutableMapping):
             raise KeyError("The pandas needs to be read in to update the weather file {}".format(e))
     #
     def add_additional_weather(self, data_array):
+        print(self["weather_panda"].shape[0])
         add_weather_pd = pd.DataFrame.from_dict(data_array)
         add_weather_pd = add_weather_pd[self.get_all_weather_names()]
+        print(add_weather_pd.shape[0])
         self["weather_panda"] = self["weather_panda"].append(add_weather_pd,ignore_index=True,sort=False)
         w_columns = self["weather_panda"].columns
         while not (w_columns[0] in self.get_all_weather_names()):
             self["weather_panda"] = self["weather_panda"].drop(w_columns[0],axis=1)
             w_columns = self["weather_panda"].columns
+            print(self["weather_panda"].shape[0])
     #
     def save_weather(self):
         self["weather_panda"].to_csv(self["cfg"]["weather_file"],na_rep="0")

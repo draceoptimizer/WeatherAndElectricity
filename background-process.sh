@@ -16,6 +16,6 @@ if [ ${GETWEATHER1} -eq 1 ]
 then
     echo "Starting weather gather in background."
     echo $(date) > ${GATHERWEATHERSTAT}
-    nohup ./weather_model_driver.py --gather-weather >> ${GATHERWEATHERSTAT} 2>&1 &
+    nohup ./weather_model_driver.py --gather-weather 2>&1 >> ${GATHERWEATHERSTAT}  &
     echo "Running test in background."
 fi
