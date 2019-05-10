@@ -57,11 +57,13 @@ class Config(collections.MutableMapping):
         self.conf["processed_directory"] = self.__check_value__(cfg,"processed_directory","The generic processed directory")
         self.conf["weather_file"] = self.__check_value__(cfg,"weather_file","The weather file name must be provided.")
         self.conf["usage_in_file"] = None
+        self.conf["usage_out_file"] = "usage.csv"
         full_data_directory = os.path.join(work_dir,self.conf["data_directory"])
         abs_data_directory = os.path.abspath(full_data_directory)
         assert os.path.exists(abs_data_directory), "The data path must exist: {}.  This does not create it programmatically.".format(abs_data_directory)
         self.conf["data_directory"] = abs_data_directory
         self.conf["weather_file"] = os.path.join(abs_data_directory,self.conf["weather_file"])
+        self.conf["usage_out_file"] = os.path.join(abs_data_directory,self.conf["usage_out_file"])
         #Find a potential usage_in_file
         full_usage_in_directory = os.path.join(work_dir,self.conf["usage_in_directory"])
         assert os.path.exists(full_usage_in_directory),"The usage in directory must exist: {}.  This is not created programmatically.".format(full_usage_in_directory)

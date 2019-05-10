@@ -18,10 +18,10 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-v","--verbose",dest="verbose",
     help="Increase the verbosity (no effect now)",
     action="store_true", default=False )
-parser.add_argument("--gather-weather",dest="gather_weather",
+parser.add_argument("-g","--gather-weather",dest="gather_weather",
     help="Gather data from Dark Sky up to the current date.",
     action="store_true", default=False )
-parser.add_argument("--process-input-usage",dest="process_input_usage",
+parser.add_argument("-u","--process-input-usage",dest="process_input_usage",
     help="Process an input file of usage data to match weather data.",
     action="store_true", default=False )
 parms = parser.parse_args()
@@ -40,7 +40,6 @@ if __name__ == "__main__":
     if parms.gather_weather and num_processing_steps == 0:
         print("Starting to gather the weather.",flush=True)
         gather_weather(start_config)
-
         num_processing_steps += 1
 
     if parms.process_input_usage and num_processing_steps == 0:

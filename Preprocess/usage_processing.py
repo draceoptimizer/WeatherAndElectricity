@@ -20,4 +20,13 @@ def process_usage_input(config: Config):
         sys.stdout.flush()
         ud = UsageManagement(config)
         ud.set_usage_in_panda()
+        ud.basic_conversions()
+        ud.sum_kwh()
+        ud.save_usage()
+        if config["verbose"]:
+            print("Changing the USAGE DATE format.")
+            pprint(ud["usage_processed"].head())
+            pprint(ud["usage_processed"].tail())
+            pprint(ud["cfg"]["usage_in_file"])
+            pprint(ud["cfg"]["usage_out_file"])
         
