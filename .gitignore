@@ -7,3 +7,5 @@ __pycache__/*
 Data
 Data/*
 *.out
+InputData
+InputData/*
