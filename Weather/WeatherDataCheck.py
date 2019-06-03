@@ -84,7 +84,14 @@ class WeatherDataCheck(collections.MutableMapping):
                 short_days = short_day_counts.shape
                 print("The number of short days is: {}".format(short_days[0]))
                 #Trying to correct
-                pprint(short_day_counts.iloc[0])
+                work_day = short_day_counts.iloc[0]
+                temp_config = deepcopy(self.data["cfg"])
+                #change to reflect the current date that is a problem
+                yr, mon, day = work_day["day"].split("/")
+                temp_config["year"] = yr
+                temp_config["month"] = mon
+                temp_config["day"] = day
+                work_data = get_historical_data(temp_config)
         except KeyError as e:
             raise KeyError("The pandas needs to be read in to update the weather file {}".format(e))
     #
