@@ -93,6 +93,7 @@ class WeatherDataCheck(collections.MutableMapping):
                 temp_config["month"] = mon
                 temp_config["day"] = day
                 work_data = get_historical_weather(temp_config)
+                pprint(work_data
         except KeyError as e:
             raise KeyError("The pandas needs to be read in to update the weather file {}".format(e))
     #
