@@ -87,7 +87,7 @@ class WeatherDataCheck(collections.MutableMapping):
                 total_data_pts = short_days['counts'].sum()
                 print("The number of missing data points is: {}".format(short_days[0]*24 - total_data_pts))
                 #Summerize the missing data points
-                total_points = self["weather_panda"].df_shape
+                total_points = self["weather_panda"].shape
                 print("The number of points found is: {}".format(total_points[0]))
                 
         except KeyError as e:
