@@ -89,9 +89,9 @@ class WeatherDataCheck(collections.MutableMapping):
                 temp_config = deepcopy(self.data["cfg"])
                 #change to reflect the current date that is a problem
                 yr, mon, day = work_day["day"].split("/")
-                temp_config["year"] = yr
-                temp_config["month"] = mon
-                temp_config["day"] = day
+                temp_config["year"] = int(yr)
+                temp_config["month"] = int(mon)
+                temp_config["day"] = int(day)
                 work_data = get_historical_weather(temp_config)
                 pprint(work_data)
         except KeyError as e:
