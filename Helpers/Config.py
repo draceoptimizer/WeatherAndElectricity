@@ -24,6 +24,16 @@ class Config(collections.MutableMapping):
     deriving information from the current location of a computer.
 
     """
+    #TODO:  Need to update this so it uses hierarchical configuration files:
+    #TODO:  Probably these right now:
+    #TODO:      general     - These are general knowledge that is shared
+    #TODO:      gather      - These are items that are used for gathering weather data
+    #TODO:      usage       - These are items that are used to transform raw usage data
+    #TODO:      weather_model - These are items that are used to build weather models
+    #TODO:      nn          - These are items that are used to transform data suitable for nn modeling of usage
+    #TODO:  Probably do this using a v2 capability of the configuration
+
+    #TODO:  Need to replace the use of asserts with checks and logging capabilities, asserts are a little brutal
 
     def __init__(self,work_dir=None,config_file=None):
         assert work_dir is not None, "The working directory must be provided."
