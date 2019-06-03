@@ -84,7 +84,7 @@ class WeatherDataCheck(collections.MutableMapping):
                 short_day_counts = day_counts[day_counts['counts'] < 24]
                 short_days = short_day_counts.shape
                 print("The number of short days is: {}".format(short_days[0]))
-                total_data_pts = short_days['counts'].sum()
+                total_data_pts = short_day_counts['counts'].sum()
                 print("The number of missing data points is: {}".format(short_days[0]*24 - total_data_pts))
                 #Summerize the missing data points
                 total_points = self["weather_panda"].shape
