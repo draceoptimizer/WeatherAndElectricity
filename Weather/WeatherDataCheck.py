@@ -4,6 +4,7 @@ from copy import deepcopy
 from pprint import pformat, pprint
 import collections
 import pandas as pd
+from Preprocess.dark_sky_management import *
 
 class WeatherDataCheck(collections.MutableMapping):
     """The class for managing the working weather data structures for processing
@@ -91,7 +92,7 @@ class WeatherDataCheck(collections.MutableMapping):
                 temp_config["year"] = yr
                 temp_config["month"] = mon
                 temp_config["day"] = day
-                work_data = get_historical_data(temp_config)
+                work_data = get_historical_weather(temp_config)
         except KeyError as e:
             raise KeyError("The pandas needs to be read in to update the weather file {}".format(e))
     #
