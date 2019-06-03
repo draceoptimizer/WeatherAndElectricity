@@ -84,18 +84,12 @@ class WeatherDataCheck(collections.MutableMapping):
                 short_day_counts = day_counts[day_counts['counts'] < 24]
                 short_days = short_day_counts.shape
                 print("The number of short days is: {}".format(short_days[0]))
-                #Trying to correct
-                work_day = short_day_counts.iloc[0]
-                pprint(work_day)
-                temp_config = deepcopy(self.data["cfg"])
-                #change to reflect the current date that is a problem
-                yr, mon, day = work_day["day"].split("/")
-                temp_config["year"] = int(yr)
-                temp_config["month"] = int(mon)
-                temp_config["day"] = int(day)
-                work_data = get_historical_weather(temp_config)
-                print(len(work_data['data']))
-                pprint(work_data)
+                total_data_pts = short_days['counts'].sum()
+                print("The number of missing data points is: {}".format(short_days[0]*24 - total_data_pts))
+                #Summerize the missing data points
+                total_points = self["weather_panda"].df_shape
+                print("The number of points found is: {}".format(total_points[0]))
+                
         except KeyError as e:
             raise KeyError("The pandas needs to be read in to update the weather file {}".format(e))
     #
