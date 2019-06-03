@@ -83,7 +83,8 @@ class WeatherDataCheck(collections.MutableMapping):
                 short_day_counts = day_counts[day_counts['counts'] < 24]
                 short_days = short_day_counts.shape
                 print("The number of short days is: {}".format(short_days[0]))
-                pprint(short_day_counts)
+                #Trying to correct
+                pprint(short_day_counts.iloc[0])
         except KeyError as e:
             raise KeyError("The pandas needs to be read in to update the weather file {}".format(e))
     #
