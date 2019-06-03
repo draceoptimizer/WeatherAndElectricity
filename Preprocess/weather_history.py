@@ -12,6 +12,7 @@ from Preprocess.dark_sky_management import *
 from Preprocess.weather_processing import *
 from Helpers.Config import Config
 from Weather.WeatherManagement import WeatherManagement
+from Weather.WeatherDataCheck import WeatherDataCheck
 
 """Process the weather data up to the current date
 
@@ -30,7 +31,7 @@ Side Effects:
     These fields are mostly self explanatory
 """
 
-#  Default values
+#  Gather the weather history
 def gather_weather(config:Config):
     while True:
         print("Starting to gather weather data.")
@@ -74,5 +75,12 @@ def gather_weather(config:Config):
         print("Sleeping to not try too much per day (per Dark Sky)")
         sys.stdout.flush()
         time.sleep(60 * 60)
-        
+#  Check the weather history
+def check_weather(config:Config):
+    print("Starting to check weather data.")
+    print("================{}==============".format(datetime.today()))
+    sys.stdout.flush()
+    gw = WeatherDataCheck(config)
+    gw.set_weather_panda()
+    gw.check_weather_dates()
 
