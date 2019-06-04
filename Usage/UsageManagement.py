@@ -134,17 +134,18 @@ class UsageManagement(collections.MutableMapping):
         """
         processed_dir = self["cfg"]["usage_in_processed_directory"]
         input_file = self["cfg"]["usage_in_file"]
+        abs_input_file = os.path.abspath(input_file)
         output_file = self["cfg"]["usage_out_file"]
         #Move the input file
         if self["cfg"]["verbose"]:
             print("Processed Directory: {}".format(processed_dir))
-            print("Original Input File: {}".format(input_file))
+            print("Original Input File: {}".format(abs_input_file))
         base_input_file = os.path.basename(input_file)
         processed_file = os.path.join(processed_dir,base_input_file)
         if self["cfg"]["verbose"]:
             print("Base Input File: {}".format(base_input_file))
             print("Processed File: {}".format(processed_file))
-        shutil.move(input_file,processed_file)
+        shutil.move(abs_input_file,processed_file)
 
         # Read in the existing file
         work_pd = None
