@@ -140,10 +140,11 @@ class UsageManagement(collections.MutableMapping):
             print("Original Input File: {}".format(input_file))
         base_input_file = os.path.basename(input_file)
         processed_file = os.path.join(processed_dir,base_input_file)
-        os.rename(input_file,processed_file)
         if self["cfg"]["verbose"]:
             print("Base Input File: {}".format(base_input_file))
             print("Processed File: {}".format(processed_file))
+        os.rename(input_file,processed_file)
+
         # Read in the existing file
         work_pd = None
         try:
