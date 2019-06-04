@@ -49,6 +49,7 @@ class Config(collections.MutableMapping):
         self.conf["max_number_requests"] = 2
         self.conf["weather_file"] = "weather.txt"
         self.conf["verbose"] = False
+        self.conf["usage_in_file"] = None
         #This is the working year, month day used to control processing
         self.conf["year"] = None
         self.conf["month"] = None
@@ -66,7 +67,7 @@ class Config(collections.MutableMapping):
         self.conf["usage_in_directory"] = self.__check_value__(cfg,"usage_in_directory","The input usage directory must be provided.")
         self.conf["processed_directory"] = self.__check_value__(cfg,"processed_directory","The generic processed directory")
         self.conf["weather_file"] = self.__check_value__(cfg,"weather_file","The weather file name must be provided.")
-        self.conf["usage_in_file"] = None
+        self.conf["usage_in_file"]=self.__check_value(cfg,"usage_in_file","The usage_in_file was set to default.")
         self.conf["usage_out_file"] = "usage.csv"
         full_data_directory = os.path.join(work_dir,self.conf["data_directory"])
         abs_data_directory = os.path.abspath(full_data_directory)
@@ -74,34 +75,51 @@ class Config(collections.MutableMapping):
         self.conf["data_directory"] = abs_data_directory
         self.conf["weather_file"] = os.path.join(abs_data_directory,self.conf["weather_file"])
         self.conf["usage_out_file"] = os.path.join(abs_data_directory,self.conf["usage_out_file"])
-        #Find a potential usage_in_file
-        full_usage_in_directory = os.path.join(work_dir,self.conf["usage_in_directory"])
-        assert os.path.exists(full_usage_in_directory),"The usage in directory must exist: {}.  This is not created programmatically.".format(full_usage_in_directory)
-        full_usage_processed_directory = os.path.join(full_usage_in_directory,self.conf["processed_directory"])
-        assert os.path.exists(full_usage_processed_directory), "The usage in processed directory must exist: {}. This is not created programatically.".format(full_usage_processed_directory)
-        self.conf["usage_in_processed_directory"] = full_usage_processed_directory
-        match_file_name = os.path.join(full_usage_in_directory,"*.csv")
-        glob_list = glob.glob(match_file_name)
-        self.conf["usage_in_file"] = glob_list[0] if len(glob_list) > 0 else None
-        try:
-            self.conf["verbose"] = cfg["verbose"]
-        except:
-            pass
+        #Additional processing beyond just the first level default values
+        # usage_in_file processing
+        if self.conf["usage_in_file"] is None:
+            full_usage_in_directory = os.path.join(work_dir,self.conf["usage_in_directory"])
+            assert os.path.exists(full_usage_in_directory),"The usage in directory must exist: {}.  This is not created programmatically.".format(full_usage_in_directory)
+            full_usage_processed_directory = os.path.join(full_usage_in_directory,self.conf["processed_directory"])
+            assert os.path.exists(full_usage_processed_directory), "The usage in processed directory must exist: {}. This is not created programatically.".format(full_usage_processed_directory)
+            self.conf["usage_in_processed_directory"] = full_usage_processed_directory
+            match_file_name = os.path.join(full_usage_in_directory,"*.csv")
+            glob_list = glob.glob(match_file_name)
+            self.conf["usage_in_file"] = glob_list[0] if len(glob_list) > 0 else None
+            try:
+                self.conf["verbose"] = cfg["verbose"]
+            except:
+                pass
 
     #
     def __check_value__(self,cfg=None,dict_key=None,msg=None):
+        """Checks the values for inputs.
+        The logic within this routine requires all of the key/value pairs to be defined otherwise the
+        program aborts with the input message.
+        
+        Keyword Arguments:
+            cfg {dict} -- A dictionary of the default values from reading in the config file (default: {None})
+            dict_key {str} -- The key to search for in the cfg (default: {None})
+            msg {str} -- A message to output upon failure (default: {None})
+        
+        Returns:
+            [type] -- [description]
+        """
         assert cfg is not None
         assert dict_key is not None
         assert msg is not None
+        #  This first step tries to return the value from the input config file
         try:
             return cfg[dict_key]
         except KeyError:
+            #This step returns the value from the default definitions or aborts.  
+            #This forces all config key/value pairs to be defined.
             if dict_key in self.conf:
                 return self.conf[dict_key]
             else:
-                self.__stop_input_processing(msg)
+                self.__stop_input_processing__(msg)
     #
-    def __stop_input_processing(self, msg=None):
+    def __stop_input_processing__(self, msg=None):
         assert msg is not None
         pprint(msg)
         sys.exit(1)
@@ -136,10 +154,13 @@ class Config(collections.MutableMapping):
         return self.conf["start_year"], self.conf["start_month"],self.conf["start_day"]
     def get_ymd(self):
         return self.conf["year"], self.conf["month"],self.conf["day"]
-    def update_ymd(self,yr, mon, day):
-        self.conf["year"] = yr
-        self.conf["month"] = mon
-        self.conf["day"] = day
+    def update_ymd(self,yr=None, mon=None, day=None):
+        assert yr is not None, "In update_ymd, the year must not be None."
+        assert mon is not None, "In update_ymd, the month must not be None."
+        assert day is not None, "In update_ymd, the day must not be None."
+        self.conf["year"] = int(yr)
+        self.conf["month"] = int(mon)
+        self.conf["day"] = int(day)
     def extract_date(self) -> date:
         '''Simple method to return a string from current date in object
 
