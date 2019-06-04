@@ -6,6 +6,7 @@ import collections
 import pandas as pd
 import os
 import shutil
+from pathlib import Path
 #
 class UsageManagement(collections.MutableMapping):
     """
@@ -134,7 +135,7 @@ class UsageManagement(collections.MutableMapping):
         """
         processed_dir = self["cfg"]["usage_in_processed_directory"]
         input_file = self["cfg"]["usage_in_file"]
-        abs_input_file = os.path.abspath(input_file)
+        abs_input_file = Path(input_file).resolve()
         output_file = self["cfg"]["usage_out_file"]
         #Move the input file
         if self["cfg"]["verbose"]:
