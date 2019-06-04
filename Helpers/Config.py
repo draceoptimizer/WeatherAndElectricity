@@ -67,7 +67,7 @@ class Config(collections.MutableMapping):
         self.conf["usage_in_directory"] = self.__check_value__(cfg,"usage_in_directory","The input usage directory must be provided.")
         self.conf["processed_directory"] = self.__check_value__(cfg,"processed_directory","The generic processed directory")
         self.conf["weather_file"] = self.__check_value__(cfg,"weather_file","The weather file name must be provided.")
-        self.conf["usage_in_file"]=self.__check_value(cfg,"usage_in_file","The usage_in_file was set to default.")
+        self.conf["usage_in_file"]=self.__check_value__(cfg,"usage_in_file","The usage_in_file was set to default.")
         self.conf["usage_out_file"] = "usage.csv"
         full_data_directory = os.path.join(work_dir,self.conf["data_directory"])
         abs_data_directory = os.path.abspath(full_data_directory)
