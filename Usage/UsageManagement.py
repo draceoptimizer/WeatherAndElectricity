@@ -5,6 +5,7 @@ from pprint import pformat,pprint
 import collections
 import pandas as pd
 import os
+import shutil
 #
 class UsageManagement(collections.MutableMapping):
     """
@@ -143,7 +144,7 @@ class UsageManagement(collections.MutableMapping):
         if self["cfg"]["verbose"]:
             print("Base Input File: {}".format(base_input_file))
             print("Processed File: {}".format(processed_file))
-        os.rename(input_file,processed_file)
+        shutil.move(input_file,processed_file)
 
         # Read in the existing file
         work_pd = None
