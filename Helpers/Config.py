@@ -77,12 +77,14 @@ class Config(collections.MutableMapping):
         self.conf["usage_out_file"] = os.path.join(abs_data_directory,self.conf["usage_out_file"])
         #Additional processing beyond just the first level default values
         # usage_in_file processing
+        # Build directory for processed data
+        full_usage_in_directory = os.path.join(work_dir,self.conf["usage_in_directory"])
+        assert os.path.exists(full_usage_in_directory),"The usage in directory must exist: {}.  This is not created programmatically.".format(full_usage_in_directory)
+        full_usage_processed_directory = os.path.join(full_usage_in_directory,self.conf["processed_directory"])
+        assert os.path.exists(full_usage_processed_directory), "The usage in processed directory must exist: {}. This is not created programatically.".format(full_usage_processed_directory)
+        self.conf["usage_in_processed_directory"] = full_usage_processed_directory
+        #Find a default file to process
         if self.conf["usage_in_file"] is None:
-            full_usage_in_directory = os.path.join(work_dir,self.conf["usage_in_directory"])
-            assert os.path.exists(full_usage_in_directory),"The usage in directory must exist: {}.  This is not created programmatically.".format(full_usage_in_directory)
-            full_usage_processed_directory = os.path.join(full_usage_in_directory,self.conf["processed_directory"])
-            assert os.path.exists(full_usage_processed_directory), "The usage in processed directory must exist: {}. This is not created programatically.".format(full_usage_processed_directory)
-            self.conf["usage_in_processed_directory"] = full_usage_processed_directory
             match_file_name = os.path.join(full_usage_in_directory,"*.csv")
             glob_list = glob.glob(match_file_name)
             self.conf["usage_in_file"] = glob_list[0] if len(glob_list) > 0 else None
