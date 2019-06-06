@@ -95,8 +95,7 @@ class JoinData(collections.MutableMapping):
         """
         usage_data = self["cfg"]["pp_usage_data"]
         weather_data = self["cfg"]["pp_weather_data"]
-        joined_data = pd.merge(usage_data,weather_data,how='inner',on=['day','hm'],left_on=['day','hm'],
-        right_on=['day','hm'],copy=True)
+        joined_data = pd.merge(usage_data,weather_data,how='inner',on=['day','hm'],copy=True)
         if self["cfg"]["verbose"]:
             print("Joined format.")
             pprint(joined_data.head())
