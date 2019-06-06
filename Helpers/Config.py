@@ -50,6 +50,9 @@ class Config(collections.MutableMapping):
         self.conf["weather_file"] = "weather.txt"
         self.conf["verbose"] = False
         self.conf["usage_in_file"] = None
+        self.conf["pp_usage_data"] = None
+        self.conf["pp_weather_data"] = None
+        self.conf["joined_usage_weather_data"] = "joined_usage_weather_data.csv"
         #This is the working year, month day used to control processing
         self.conf["year"] = None
         self.conf["month"] = None
@@ -75,6 +78,7 @@ class Config(collections.MutableMapping):
         self.conf["data_directory"] = abs_data_directory
         self.conf["weather_file"] = os.path.join(abs_data_directory,self.conf["weather_file"])
         self.conf["usage_out_file"] = os.path.join(abs_data_directory,self.conf["usage_out_file"])
+        self.conf["joined_usage_weather_data"] = os.path.join(abs_data_directory,self.conf["joined_usage_weather_data"])
         #Additional processing beyond just the first level default values
         # usage_in_file processing
         # Build directory for processed data
@@ -83,7 +87,7 @@ class Config(collections.MutableMapping):
         full_usage_processed_directory = os.path.join(full_usage_in_directory,self.conf["processed_directory"])
         assert os.path.exists(full_usage_processed_directory), "The usage in processed directory must exist: {}. This is not created programatically.".format(full_usage_processed_directory)
         self.conf["usage_in_processed_directory"] = full_usage_processed_directory
-        #Find a default file to process
+        #Find a default usage file to process
         if self.conf["usage_in_file"] is None:
             match_file_name = os.path.join(full_usage_in_directory,"*.csv")
             glob_list = glob.glob(match_file_name)

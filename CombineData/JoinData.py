@@ -39,7 +39,7 @@ class JoinData(collections.MutableMapping):
     def state(self):
         return {"keys":self.data.keys(), "configuration":self["cfg"]}
     #  Initialize the pandas
-    def set_pp_usage_data_panda(self):
+    def __set_pp_usage_data_panda__(self):
         """Sets up a pandas for processing usage
 
             The processing can not proceed without this file.
@@ -51,16 +51,17 @@ class JoinData(collections.MutableMapping):
             FileNotFoundError("The preprocessed usage file must exist to process further: {}".format(self["cfg"]["usage_out_file"]))
         if work_usage is not None:
             work_usage.sort_values(["day",'hm'])
-            self["pp_usage_data"] = work_usage
+            self["cfg"]["pp_usage_data"] = work_usage
             if self["cfg"]["verbose"]:
-                print("Using preprocess usage shape: {}x{}".format(self["pp_usage_data"].shape[0],self["pp_usage_data"].shape[1]))
-                pprint(self["pp_usage_data"].head())
-                pprint(self["pp_usage_data"].tail())
+                print("Using preprocess usage shape: {}x{}".
+                format(self["cfg"]["pp_usage_data"].shape[0],self["cfg"]["pp_usage_data"].shape[1]))
+                pprint(self["cfg"]["pp_usage_data"].head())
+                pprint(self["cfg"]["pp_usage_data"].tail())
                 print("",flush=True)
         else:
             print("No Preprocessed Usage Data set!",flush=True)
             sys.exit()
-    def set_pp_weather_data_panda(self):
+    def __set_pp_weather_data_panda__(self):
         """Sets up a pandas for processing weather 
 
             Processing cannot proceed without this file
@@ -69,40 +70,38 @@ class JoinData(collections.MutableMapping):
         try:
             work_weather = pd.read_csv(self["cfg"]["weather_file"])
         except FileNotFoundError:
-            FileNotFoundError("The preprocessed usage file must exist to process further: {}".format(self["cfg"]["usage_out_file"]))
-        if work_usage is not None:
-            work_usage.sort_values(["day",'hm'])
-            self["pp_usage_data"] = work_usage
+            FileNotFoundError("The preprocessed weather file must exist to process further: {}".
+            format(self["cfg"]["weather_file"]))
+        if work_weather is not None:
+            work_weather.sort_values(["day",'hm'])
+            self["cfg"]["pp_weather_data"] = work_weather
             if self["cfg"]["verbose"]:
-                print("Using preprocess usage shape: {}x{}".format(self["pp_usage_data"].shape[0],self["pp_usage_data"].shape[1]))
-                pprint(self["pp_usage_data"].head())
-                pprint(self["pp_usage_data"].tail())
+                print("Using preprocess usage shape: {}x{}".
+                format(self["cfg"]["pp_weather_data"].shape[0],self["cfg"]["pp_weather_data"].shape[1]))
+                pprint(self["cfg"]["pp_weather_data"].head())
+                pprint(self["cfg"]["pp_weather_data"].tail())
                 print("",flush=True)
         else:
-            print("No Preprocessed Usage Data set!",flush=True)
+            print("No Preprocessed Weather Data set!",flush=True)
             sys.exit()
+    #Gather the usage and weather data
+    def gather_preprocessed_usage_weather(self):
+        self.__set_pp_usage_data_panda__()
+        self.__set_pp_weather_data_panda__()
+
     #  Perform Basic Conversions
-    def basic_conversions(self):
-        """This provides basic format changes for the usage data to match up with the 
-        Dark Sky format so that joins are possible.
-
-        (1)  Changes the - in the date to /
-        (2)  Enhances the start time so that it identifies just the hour start (this is the way the Dark Sky Works)
-
+    def join_usage_weather_data(self):
+        """Joins the usage and weather data into a single panda
         """
-        work_pd = self["usage_panda"]
-        #Change the date format
-        work_pd["USAGE_DATE"] = work_pd["USAGE_DATE"].str.replace("-","/")
+        usage_data = self["cfg"]["pp_usage_data"]
+        weather_data = self["cfg"]["pp_weather_data"]
+        joined_data = pd.merge(usage_data,weather_data,how='inner',left_on=['day','hm'],
+        right_on=['day','hm'],copy=True)
         if self["cfg"]["verbose"]:
-            print("Changing the USAGE DATE format.")
-            pprint(self["usage_panda"].head())
-            pprint(self["usage_panda"].tail())
-        #Enhance start time so it always has 00 min
-        work_pd["hm"] = work_pd["USAGE_START_TIME"].map(lambda v: v.split(":")[0] + ":00")
-        if self["cfg"]["verbose"]:
-            print("Changing the USAGE DATE format.")
-            pprint(self["usage_panda"].head())
-            pprint(self["usage_panda"].tail())
+            print("Joined format.")
+            pprint(joined_data.head())
+            pprint(joined_data.tail())
+
     #  Usage Sum By Hour
     def sum_kwh(self):
         """This provides basic format changes for the usage data to match up with the 
