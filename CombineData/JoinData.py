@@ -94,6 +94,8 @@ class JoinData(collections.MutableMapping):
         """Joins the usage and weather data into a single panda
         """
         usage_data = self["cfg"]["pp_usage_data"]
+        #Trim the hm column and day column
+        usage_data['hm'] = usage_data['hm'].apply(lambda x: x.strip())
         weather_data = self["cfg"]["pp_weather_data"]
         joined_data = pd.merge(usage_data,weather_data,how='inner',on=['day','hm'],copy=True)
         if self["cfg"]["verbose"]:
