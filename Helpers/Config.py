@@ -52,6 +52,7 @@ class Config(collections.MutableMapping):
         self.conf["usage_in_file"] = None
         self.conf["pp_usage_data"] = None
         self.conf["pp_weather_data"] = None
+        self.conf["joined_data"] = None
         self.conf["joined_usage_weather_data"] = "joined_usage_weather_data.csv"
         #This is the working year, month day used to control processing
         self.conf["year"] = None

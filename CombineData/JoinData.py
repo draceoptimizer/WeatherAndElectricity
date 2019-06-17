@@ -96,12 +96,15 @@ class JoinData(collections.MutableMapping):
         usage_data = self["cfg"]["pp_usage_data"]
         #Trim the hm column and day column
         usage_data['hm'] = usage_data['hm'].apply(lambda x: x.strip())
+        usage_data['day'] = usage_data['day'].apply(lambda x: x.strip())
         weather_data = self["cfg"]["pp_weather_data"]
-        joined_data = pd.merge(usage_data,weather_data,how='inner',on=['day','hm'],copy=True)
+        weather_data['hm'] = weather_data['hm'].apply(lambda x: x.strip())
+        weather_data['day'] = weather_data['day'].apply(lambda x: x.strip())
+        self["cfg"]["joined_data"] = pd.merge(usage_data,weather_data,how='inner',on=['day','hm'],copy=True)
         if self["cfg"]["verbose"]:
             print("Joined format.")
-            pprint(joined_data.head())
-            pprint(joined_data.tail())
+            pprint(self["cfg"]["joined_data"].head())
+            pprint(self["cfg"]["joined_data"].tail())
 
     #  Usage Sum By Hour
     def sum_kwh(self):
