@@ -24,7 +24,7 @@ def process_data_to_nn(config: Config):
         jd = JoinData(config)
         jd.gather_preprocessed_usage_weather()
         jd.join_usage_weather_data()
-  
+        jd.save_combined()
         # ud.set_usage_in_panda()
         # ud.basic_conversions()
         # ud.sum_kwh()

@@ -105,32 +105,7 @@ class JoinData(collections.MutableMapping):
             print("Joined format.")
             pprint(self["cfg"]["joined_data"].head())
             pprint(self["cfg"]["joined_data"].tail())
-
-    #  Usage Sum By Hour
-    def sum_kwh(self):
-        """This provides basic format changes for the usage data to match up with the 
-        Dark Sky format so that joins are possible.
-
-        (1)  Changes the - in the date to /
-        (2)  Enhances the start time so that it identifies just the hour start (this is the way the Dark Sky Works)
-
-        """
-        work_pd = self["usage_panda"]
-        #Change the date format
-
-        temp_pd = pd.DataFrame()
-        temp_pd["usage"] = work_pd.groupby(["USAGE_DATE","hm"])["USAGE_KWH"].sum()
-        temp_pd.reset_index(level=0,inplace=True)
-        temp_pd.reset_index(inplace=True)
-        temp_pd["day"] = temp_pd["USAGE_DATE"]
-        self["usage_processed"] = temp_pd[["day","hm","usage"]]
-        if self["cfg"]["verbose"]:
-            print("Changing the USAGE DATE format.")
-            pprint(self["usage_processed"].head())
-            pprint(self["usage_processed"].tail())
-        unique_day_hr = self.__check_unique__(self["usage_processed"])
-        assert unique_day_hr, "The hour and day values must be unique: {} during processing.  There is an error someplace.".format(unique_day_hr)
-    #Check unique values in day and hm
+    #  Check for uniqueness  (not implemented yet)
     def __check_unique__(self, in_pd: pd.DataFrame) -> bool :
         temp_index = in_pd[["day","hm"]].apply(lambda v: str(v["day"]) + " " + str(v["hm"]), axis=1)
         max_count =temp_index.value_counts().max()
@@ -143,51 +118,16 @@ class JoinData(collections.MutableMapping):
             return False
         else:
             return True
-    #  Save the usage data
+    #  Save the combined data
     def save_combined(self):
-        """This saves the updated usage information with the following steps:
-        (1)  moves the input file to Processed
+        """This saves the updated combined information with the following steps:
+        (1)  replace any existing joined data file with the latest joined data file
         (2)  reads in any existing usage file into a panda
         (3)  appends the data to the existing usage data
         (4)  writes the usage data back out
 
         """
-        processed_dir = self["cfg"]["usage_in_processed_directory"]
-        input_file = self["cfg"]["usage_in_file"]
-        abs_input_file = Path(input_file).resolve()
-        output_file = self["cfg"]["usage_out_file"]
-        #Move the input file
-        if self["cfg"]["verbose"]:
-            print("Processed Directory: {}".format(processed_dir))
-            print("Original Input File: {}".format(abs_input_file))
-        base_input_file = os.path.basename(input_file)
-        processed_file = os.path.join(processed_dir,base_input_file)
-        if self["cfg"]["verbose"]:
-            print("Base Input File: {}".format(base_input_file))
-            print("Processed File: {}".format(processed_file))
-        shutil.move(abs_input_file,processed_file)
+        outfile = self["cfg"]["joined_usage_weather_data"]
+        output_data = self["cfg"]["joined_data"]
+        output_data.to_csv(outfile,index=False)
 
-        # Read in the existing file
-        work_pd = None
-        try:
-            work_pd = pd.read_csv(output_file)
-        except:
-            work_pd = pd.DataFrame(columns=self["usage_out_names"])
-        #Append the usage panda
-        work_pd = work_pd.append(self["usage_processed"],ignore_index=True,sort=False)
-        w_columns = work_pd.columns
-        while not (w_columns[0] in self["usage_out_names"]):
-            work_pd = work_pd.drop(w_columns[0],axis=1)
-            w_columns = work_pd.columns
-            if self["cfg"]["verbose"]:
-                pprint(work_pd.shape)
-        work_pd = work_pd.sort_values(["day","hm"])
-        pprint(work_pd.head())
-        pprint(work_pd.dtypes)
-        unique_day_hr = self.__check_unique__(work_pd)
-        assert unique_day_hr, "The hour and day values must be unique: {} before writing.  There is an error someplace.".format(unique_day_hr)
-        #Write the file
-        if self["cfg"]["verbose"]:
-            print("The output file name is {}.".format(output_file))
-        work_pd.to_csv(output_file,na_rep="0")
-        #TODO:  I need to process the hr and day values if they are not unique, then log the differences
